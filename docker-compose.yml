@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: innovatech-backend
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_ENDPOINT=${DB_ENDPOINT}
+      - DB_PORT=3306
+      - DB_NAME=${DB_NAME}
+      - DB_USERNAME=${DB_USERNAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+    restart: unless-stopped
+    networks:
+      - innovatech-net
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: innovatech-mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+    volumes:
+      - mysql-data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - innovatech-net
+
+volumes:
+  mysql-data:
+    driver: local
+
+networks:
+  innovatech-net:
+    driver: bridge
